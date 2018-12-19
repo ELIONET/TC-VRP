@@ -17,6 +17,20 @@ public class Solution {
 		this.solution = sol;
 	}
 	
+	public void add(Tour t){
+		this.solution.add(t);
+	
+	}
+	
+	public String toString(){
+		String c = "la solution a les tours" ;
+		for(Tour t : this.solution){
+			c =  c + t.toString() + "\n ";
+		}
+		c = c + "la distance totalte est donc " + this.distance();
+		return c ;
+	}
+	
 	public ArrayList<Client> getHubs(){
 		ArrayList<Client> hubs = new ArrayList<Client>();
 		
@@ -25,6 +39,14 @@ public class Solution {
 		}
 		
 		return hubs;
+	}
+	
+	public double distance(){
+		double somme = 0 ;
+		for(Tour t : this.solution){
+			somme = somme + t.distance_Globale();
+		}
+		return somme;
 	}
 	
 	public Solution copySolution(){

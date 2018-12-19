@@ -1,20 +1,36 @@
 package tcvrp;
 
 import tcvrp.model.Client;
+import tcvrp.model.Solution;
 import tcvrp.model.Tour;
 
 public class Main {
 
 	public static void main(String[] args) {
-		Client c = new Client();
+		Client c1 = new Client();
 		Client c2 = new Client(2);
-		Tour t = new Tour(c);
+		Client c3 = new Client(3);
+		
+		
+		Tour t = new Tour(c1);
 		Tour t2;
+		
 		System.out.println(c2.toString());
 		t2 = t.copyTour();
 		t2.addAtTheEnd(c2);
+		
+		t.addAtTheEnd(c3);
 		System.out.println("t2 cette fois");
 		System.out.println(t2.toString());
+		
+		Solution s = new Solution();
+		s.add(t);
+		s.add(t2);
+		
+		
+		System.out.println("notre premiere solution");
+		System.out.println (s.toString());
+		
 		// Etape 1 = algo glouton pour borne sup = k
 		
 		// Etape 2 = PLNE pour placer k TC
