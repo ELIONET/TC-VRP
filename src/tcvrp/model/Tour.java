@@ -19,13 +19,10 @@ public class Tour {
 		this.tour = new ArrayList<Client>(t);
 		
 	}
-	
-	
+		
 	public Tour copyTour(){
-		ArrayList<Client> tab = new ArrayList<Client>(this.tour);
-		
-		return new Tour(this.hub, tab); 
-		
+		ArrayList<Client> tab = new ArrayList<Client>(this.tour);		
+		return new Tour(this.hub, tab); 		
 	}
 	
 	public void addAtTheEnd(Client c){
