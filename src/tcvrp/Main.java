@@ -7,12 +7,14 @@ public class Main {
 
 	public static void main(String[] args) {
 		Client c = new Client();
+		Client c2 = new Client(2);
 		Tour t = new Tour(c);
 		Tour t2;
-		System.out.println(t.toString());
+		System.out.println(c2.toString());
 		t2 = t.copyTour();
+		t2.addAtTheEnd(c2);
 		System.out.println("t2 cette fois");
-		System.out.println(t.toString());
+		System.out.println(t2.toString());
 		// Etape 1 = algo glouton pour borne sup = k
 		
 		// Etape 2 = PLNE pour placer k TC
