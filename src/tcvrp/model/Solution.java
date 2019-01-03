@@ -6,7 +6,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Solution {
 
+	public static final int SPEED = 50; // km/h
 	private static final int MAX_ITERATION = 30;
+	public static final double DAY_DURATION = 8;
+	
 	public ArrayList<Tour> solution;
 	
 	public Solution(){
@@ -19,7 +22,6 @@ public class Solution {
 	
 	public void add(Tour t){
 		this.solution.add(t);
-	
 	}
 	
 	public String toString(){
@@ -66,7 +68,7 @@ public class Solution {
 		
 		Solution copy = this.copySolution();
 		
-		//copy.solution.get(tourNum).intraSwap();
+		copy.solution.get(tourNum).intraSwap();
 		
 		return copy;
 		
@@ -76,7 +78,7 @@ public class Solution {
 		
 		Solution copy = this.copySolution();
 		
-		//copy.solution.get(tourNum).intraShift();
+		copy.solution.get(tourNum).intraShift();
 		
 		return copy;
 		
@@ -86,7 +88,7 @@ public class Solution {
 		
 		Solution copy = this.copySolution();
 		
-		//copy.solution.get(tourNum).intraOpt(kOpt);
+		copy.solution.get(tourNum).intraOpt(kOpt);
 		
 		return copy;
 		
@@ -116,6 +118,8 @@ public class Solution {
 			iteration++;
 		}
 		
+		possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
+		
 		if(!possible){
 			copy = this;
 		}
@@ -142,6 +146,8 @@ public class Solution {
 			
 			iteration++;
 		}
+		
+		possible = copy.solution.get(tourNum2).isFeasible();
 		
 		if(!possible){
 			copy = this;
@@ -186,6 +192,8 @@ public class Solution {
 			
 			iteration++;
 		}
+		
+		possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
 		
 		if(!possible){
 			copy = this;

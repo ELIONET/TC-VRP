@@ -1,5 +1,7 @@
 package tcvrp;
 
+import java.util.ArrayList;
+
 import tcvrp.model.Client;
 import tcvrp.model.Solution;
 import tcvrp.model.Tour;
@@ -30,6 +32,7 @@ public class Main {
 		
 		System.out.println("notre premiere solution");
 		System.out.println (s.toString());
+		
 		
 		// Etape 1 = algo glouton pour borne sup = k
 		

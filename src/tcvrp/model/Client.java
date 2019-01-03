@@ -10,7 +10,10 @@ public class Client {
 	
 	public int frequency;
 	
-	public int visitTime;
+	//Used for solution initialisation
+	public int numberOfTimeVisited;
+	
+	public double visitTime;
 	public HashMap<Client,Float> distances;
 
 	
@@ -21,6 +24,7 @@ public class Client {
 		this.frequency = 5;
 		this.visitTime = 5;
 		this.distances = new HashMap<Client,Float>();
+		this.numberOfTimeVisited = 0;
 	}	
 	
 	public Client(int k ){
@@ -29,6 +33,7 @@ public class Client {
 		this.frequency = 3;
 		this.visitTime = 3;
 		this.distances = new HashMap<Client,Float>();
+		this.numberOfTimeVisited = 0;
 	}	
 	
 	public Client(int posX, int posY, int frequency, int visitTime){
@@ -37,6 +42,7 @@ public class Client {
 		this.frequency = frequency;
 		this.visitTime = visitTime;
 		this.distances = new HashMap<Client,Float>();
+		this.numberOfTimeVisited = 0;
 
 	}
 	
