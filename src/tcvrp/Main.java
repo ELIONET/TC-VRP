@@ -9,6 +9,7 @@ import tcvrp.model.Tour;
 public class Main {
 
 	public static void main(String[] args) {
+		/*
 		Client c1 = new Client();
 		Client c2 = new Client(2);
 		Client c3 = new Client(3);
@@ -32,7 +33,8 @@ public class Main {
 		
 		System.out.println("notre premiere solution");
 		System.out.println (s.toString());
-		
+		*/
+
 		
 		// Etape 1 = algo glouton pour borne sup = k
 		

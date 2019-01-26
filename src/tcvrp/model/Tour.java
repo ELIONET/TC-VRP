@@ -8,20 +8,20 @@ public class Tour {
 
 	public Client hub; // tc
 	public ArrayList<Client> tour; // liste de clients a voir
-	public double distanceTour;
+	public double tourDuration;
 	
 	public Tour(Client hub){
 		this.tour = new ArrayList<Client>();
 		this.hub = hub;
 		this.tour.add(hub);
 		this.tour.add(hub);
-		this.distanceTour = 0;
+		this.tourDuration = 0;
 	}
 	
 	public Tour(Client h, ArrayList<Client> t){
 		this.hub = h;
 		this.tour = new ArrayList<Client>(t);
-		this.distanceTour = this.distance_Globale();
+		this.tourDuration = this.updateTotalVisitTime();
 		
 	}
 		
@@ -32,19 +32,19 @@ public class Tour {
 	
 	public void addAtTheEnd(Client c){
 		this.tour.add( this.tour.size()-1, c );
-		this.distance_Globale();
+		this.updateTotalVisitTime();
 	}
 	
 	public String toString(){
-		String chaine = "notre hub est " + this.hub.toString()+"\n notre distance de tour est "
-				+ this.distance_Globale() + "\n et notre tour est : \n";
+		String chaine = "notre hub est " + this.hub.toString()+"\n notre durée de tour est "
+				+ this.tourDuration + "\n et notre tour est : \n";
 		for(Client t : this.tour){
 			chaine = chaine + t.toString();
 		}
 		return chaine;
 	}
-	
-	public double getTotalVisitTime(){
+
+	public double updateTotalVisitTime(){
 		double total = 0;
 		
 		for(int i = 0; i < this.tour.size()-2; i++){
@@ -59,16 +59,7 @@ public class Tour {
 	}
 	
 	public boolean isFeasible(){
-		return this.getTotalVisitTime() <= Solution.DAY_DURATION;
-	}
-	
-	public double distance_Globale(){
-		double somme = 0 ;
-		for(int i = 0; i < this.tour.size()-1; i++ ){
-			somme =  (somme + this.tour.get(i).distance(this.tour.get(i+1)));			
-		}
-		this.distanceTour = somme;
-		return somme;
+		return this.tourDuration <= Solution.DAY_DURATION;
 	}
 
 	public void intraSwap() {

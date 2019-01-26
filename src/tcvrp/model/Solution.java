@@ -29,7 +29,7 @@ public class Solution {
 		for(Tour t : this.solution){
 			c =  c + t.toString() + "\n ";
 		}
-		c = c + "la distance totalte est donc " + this.distance();
+		c = c + "le temps totalte est donc " + this.computeTotalVisitTime();
 		return c ;
 	}
 	
@@ -41,14 +41,6 @@ public class Solution {
 		}
 		
 		return hubs;
-	}
-	
-	public double distance(){
-		double somme = 0 ;
-		for(Tour t : this.solution){
-			somme = somme + t.distance_Globale();
-		}
-		return somme;
 	}
 	
 	public Solution copySolution(){
@@ -64,6 +56,118 @@ public class Solution {
 		return copySol;
 	}
 	
+	public Solution simmulatedAnnealing(Solution solInit){
+		Solution bestSol = solInit.copySolution();
+		Solution currentSol = solInit.copySolution();
+		Solution solPrime = solInit.copySolution();
+		long startTime = System.currentTimeMillis();
+		int runningTime = 5; // En minutes
+		
+		int tMax = 25000;
+		double T0 = initTemperature(solInit);
+		double T = T0;
+		double Tb = T0;
+		double Tmax = 25000;
+		int len = 25;
+		int kOpt = 3;
+		double alpha = 0.9;
+		
+		while(System.currentTimeMillis() * startTime < 1000 * runningTime){
+			for(int k = 1; k <= len; k++){
+				switch(1 + (int)(Math.random() * 6)){
+				case(1): // Intra Swap
+					solPrime = intraSwap(currentSol,(int) Math.random() * this.solution.size());
+					break;
+				case(2): // Intra Shift
+					solPrime = intraShift(currentSol,(int) Math.random() * this.solution.size());
+					break;
+				case(3): // Intra Opt
+					int tour = (int) Math.random() * this.solution.size();
+					int iter = 0;
+					while(currentSol.solution.get(tour).tour.size() < kOpt + 2 && iter < 100){
+						tour = (int) Math.random() * this.solution.size();
+						iter++;
+					}
+					if(iter >= 100){ // Au cas où il n'y ait pas assez de tournées de taille kOpt
+						break;
+					}
+					solPrime = intraOpt(currentSol, tour, kOpt);
+					break;
+				case(4): // Inter Swap
+					int tour1 = (int) Math.random() * this.solution.size();
+					int tour2 = (int) Math.random() * this.solution.size();
+					while(tour1 == tour2){
+						tour1 = (int) Math.random() * this.solution.size();
+					}
+					solPrime = interSwap(currentSol, tour1, tour2);
+					break;
+				case(5): // Inter Shift
+					int tour1b = (int) Math.random() * this.solution.size();
+					int tour2b = (int) Math.random() * this.solution.size();
+					while(tour1b == tour2b){
+						tour1b = (int) Math.random() * this.solution.size();
+					}
+					solPrime = interShift(currentSol, tour1b, tour2b);
+					break;
+				case(6): // Inter Opt
+					int tour1c = (int) Math.random() * this.solution.size();
+					int tour2c = (int) Math.random() * this.solution.size();
+					int iter2 = 0;
+					while(currentSol.solution.get(tour1c).tour.size() < kOpt + 2 && iter2 < 100){
+						tour1c = (int) Math.random() * this.solution.size();
+					}
+					if(iter2 >= 100){ // Au cas où il n'y ait pas assez de tournées de taille kOpt
+						break;
+					}
+					iter2 = 0;
+					while(currentSol.solution.get(tour2c).tour.size() < kOpt + 2 || tour2c == tour1c && iter2 < 100){
+						tour2c = (int) Math.random() * this.solution.size();
+					}
+					if(iter2 >= 100){ // Au cas où il n'y ait pas assez de tournées de taille kOpt
+						break;
+					}
+					solPrime = interOpt(currentSol, tour1c, tour2c, kOpt);
+					break;
+				}
+				
+				if(solPrime.computeTotalVisitTime() <= currentSol.computeTotalVisitTime()){
+					currentSol = solPrime.copySolution();
+				}
+				else{
+					if(Math.exp( -(solPrime.computeTotalVisitTime() - currentSol.computeTotalVisitTime()) / T ) < Math.random()){
+						currentSol = solPrime.copySolution();
+					}
+				}
+				if(solPrime.computeTotalVisitTime() <= bestSol.computeTotalVisitTime()){
+					bestSol = solPrime.copySolution();
+					Tb = T;
+				}
+				T = T * alpha;
+				if(T <= 0.01){
+					Tb = 2 * Tb;
+					T = Math.min(Tb, Tmax);
+				}
+			}
+		}
+		
+		System.out.println("");
+		
+		return bestSol;
+	}
+	
+	private double initTemperature(Solution solInit) {
+		double w = 0.3; // Une solution w fois pire aura 50% de chance d'être acceptée
+		return -(w*solInit.computeTotalVisitTime())/Math.log(0.5);
+	}
+
+	private int computeTotalVisitTime() {
+		int total = 0;
+		for(Tour t : this.solution){
+			total += t.tourDuration;
+		}
+		return total;
+	}
+
 	public Solution intraSwap(Solution sol, int tourNum){
 		
 		Solution copy = this.copySolution();
@@ -116,9 +220,14 @@ public class Solution {
 			copy.solution.get(tourNum2).tour.add(numC2, c1);
 			
 			iteration++;
+			
+			copy.solution.get(tourNum1).updateTotalVisitTime();
+			copy.solution.get(tourNum2).updateTotalVisitTime();
+			
+			possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
 		}
 		
-		possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
+		
 		
 		if(!possible){
 			copy = this;
