@@ -56,7 +56,7 @@ public class Solution {
 		return copySol;
 	}
 	
-	public Solution simmulatedAnnealing(Solution solInit){
+	public Solution simulatedAnnealing(Solution solInit){
 		Solution bestSol = solInit.copySolution();
 		Solution currentSol = solInit.copySolution();
 		Solution solPrime = solInit.copySolution();
