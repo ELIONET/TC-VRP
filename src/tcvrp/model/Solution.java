@@ -56,11 +56,26 @@ public class Solution {
 		return copySol;
 	}
 	
+	public void displaySolution(){
+		for(int ntour = 0; ntour < this.solution.size(); ntour++){
+			
+			System.out.print("Tour n°" + ntour + " : ");
+			
+			for(int nclient = 0; nclient < this.solution.get(ntour).tour.size() -1; nclient++){
+				
+				System.out.print("("+this.solution.get(ntour).tour.get(nclient).posX+","+this.solution.get(ntour).tour.get(nclient).posY+") -> ");
+				
+			}
+			
+			System.out.println("("+this.solution.get(ntour).tour.get(0).posX+","+this.solution.get(ntour).tour.get(0).posY+")");
+			
+		}
+	}
+	
 	public Solution simulatedAnnealing(Solution solInit){
 		Solution bestSol = solInit.copySolution();
 		Solution currentSol = solInit.copySolution();
 		Solution solPrime = solInit.copySolution();
-		long startTime = System.currentTimeMillis();
 		int runningTime = 5; // En minutes
 		
 		int tMax = 25000;
@@ -71,6 +86,8 @@ public class Solution {
 		int len = 25;
 		int kOpt = 3;
 		double alpha = 0.9;
+		
+		long startTime = System.currentTimeMillis();
 		
 		while(System.currentTimeMillis() * startTime < 1000 * runningTime){
 			for(int k = 1; k <= len; k++){
@@ -254,9 +271,9 @@ public class Solution {
 			copy.solution.get(tourNum2).tour.add(numC1, c1);
 			
 			iteration++;
+			
+			possible = copy.solution.get(tourNum2).isFeasible();
 		}
-		
-		possible = copy.solution.get(tourNum2).isFeasible();
 		
 		if(!possible){
 			copy = this;
@@ -300,9 +317,9 @@ public class Solution {
 			copy.solution.get(tourNum2).tour.addAll(numC2, subTour1);
 			
 			iteration++;
+			
+			possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
 		}
-		
-		possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
 		
 		if(!possible){
 			copy = this;
