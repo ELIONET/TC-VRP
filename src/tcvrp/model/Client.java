@@ -3,66 +3,68 @@ import java.lang.Math;
 import java.util.HashMap;
 
 
+// import java.util.HashMap;
+
 public class Client {
-	
+
 	public int posX;
 	public int posY;
 	
-	public int frequency;
+	/*public int tempsVisite;
 	
-	//Used for solution initialisation
-	public int numberOfTimeVisited;
-	
-	public double visitTime;
-	public HashMap<Client,Float> distances;
-
+	public HashMap<Client,Integer> tempsTrajet;*/
 	
 	
-	public Client(){
-		this.posX = 5;
-		this.posY = 5;
-		this.frequency = 5;
-		this.visitTime = 5;
-		this.distances = new HashMap<Client,Float>();
-		this.numberOfTimeVisited = 0;
-	}	
-	
-	public Client(int k ){
-		this.posX = k;
-		this.posY = k;
-		this.frequency = 3;
-		this.visitTime = 3;
-		this.distances = new HashMap<Client,Float>();
-		this.numberOfTimeVisited = 0;
-	}	
-	
-	public Client(int posX, int posY, int frequency, int visitTime){
+	public Client (int posX, int posY) {
+		
 		this.posX = posX;
 		this.posY = posY;
-		this.frequency = frequency;
-		this.visitTime = visitTime;
-		this.distances = new HashMap<Client,Float>();
-		this.numberOfTimeVisited = 0;
-
+		
 	}
 	
 	
+	/*public Client (int posX, int posY, int tempsVisite, int nbClients) {
+		
+		this.posX = posX;
+		this.posY = posY;
+		
+		this.tempsVisite = tempsVisite;
+		
+		this.tempsTrajet = new HashMap<Client,Integer>();
+		this.tempsTrajet.put(this, this.distanceManhattan(this));
+		
+	}*/
 	
-	public double distance(Client b){
-		double dist = Math.sqrt(Math.pow((double)(this.posX - b.posX) , 2) + Math.pow((double)(this.posY - b.posY) , 2) );
-		if (distances.containsKey(b)  ) {
-			distances.put(b,Float.valueOf((float) dist ));			
+	
+	public int getPosX () {
+		return this.posX;
+	}
+	
+	
+	public int getPosY () {
+		return this.posY;
+	}
+	
+	
+	/*public int getTempsVisite () {
+		return this.tempsVisite;
+	}
+	
+	
+	public int getTempsTrajet (Client client) {
+		return this.tempsTrajet.get(client);
+	}
+	
+	
+	public void setTempsTrajet (Client client) {
+		if (!this.tempsTrajet.containsKey(client)) {
+			this.tempsTrajet.put(client, this.distanceManhattan(client));
 		}
-		return dist;
-	}
+	}*/
 	
-	public double min_dist(Client a, Client b){
-		return Math.min(this.distance( a), this.distance( b));
-	}
 	
-	public String toString(){
-		String message = "on est a la position (" + this.posX + ", " + this.posY + ").\n";
-		return message;
+	public int distanceManhattan (Client client) {
+		return (Math.abs(this.posX-client.getPosX())+Math.abs(this.posY-client.getPosY()));
 	}
 	
 }

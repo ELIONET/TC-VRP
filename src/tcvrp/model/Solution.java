@@ -2,6 +2,7 @@ package tcvrp.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Solution {
@@ -10,33 +11,33 @@ public class Solution {
 	private static final int MAX_ITERATION = 30;
 	public static final double DAY_DURATION = 8;
 	
-	public ArrayList<Tour> solution;
+	public ArrayList<Tournee> solution;
 	
 	public Solution(){
-		this.solution = new ArrayList<Tour>();
+		this.solution = new ArrayList<Tournee>();
 	}
 	
-	public Solution(ArrayList<Tour> sol){
+	public Solution(ArrayList<Tournee> sol){
 		this.solution = sol;
 	}
 	
-	public void add(Tour t){
+	public void add(Tournee t){
 		this.solution.add(t);
 	}
 	
 	public String toString(){
 		String c = "la solution a les tours" ;
-		for(Tour t : this.solution){
+		for(Tournee t : this.solution){
 			c =  c + t.toString() + "\n ";
 		}
 		c = c + "le temps totalte est donc " + this.computeTotalVisitTime();
 		return c ;
 	}
 	
-	public ArrayList<Client> getHubs(){
-		ArrayList<Client> hubs = new ArrayList<Client>();
+	public ArrayList<Integer> getHubs(){
+		ArrayList<Integer> hubs = new ArrayList<Integer>();
 		
-		for(Tour t : this.solution){
+		for(Tournee t : this.solution){
 			hubs.add(t.hub);
 		}
 		
@@ -45,10 +46,10 @@ public class Solution {
 	
 	public Solution copySolution(){
 		
-		ArrayList<Tour> copy = new ArrayList<Tour>();
+		ArrayList<Tournee> copy = new ArrayList<Tournee>();
 		
-		for(Tour t : this.solution){
-			copy.add(t.copyTour());
+		for(Tournee t : this.solution){
+			copy.add(t.copierTournee());
 		}
 		
 		Solution copySol = new Solution(copy);
@@ -59,15 +60,15 @@ public class Solution {
 	public void displaySolution(){
 		for(int ntour = 0; ntour < this.solution.size(); ntour++){
 			
-			System.out.print("Tour n°" + ntour + " : ");
+		System.out.print("Tournee n°" + ntour + " : ");
 			
-			for(int nclient = 0; nclient < this.solution.get(ntour).tour.size() -1; nclient++){
+			for(int nclient = 0; nclient < this.solution.get(ntour).clients.size() -1; nclient++){
 				
-				System.out.print("("+this.solution.get(ntour).tour.get(nclient).posX+","+this.solution.get(ntour).tour.get(nclient).posY+") -> ");
+				System.out.print("("+Donnees.clients.get(this.solution.get(ntour).clients.get(nclient)).posX+","+Donnees.clients.get(this.solution.get(ntour).clients.get(nclient)).posY+") -> ");
 				
 			}
 			
-			System.out.println("("+this.solution.get(ntour).tour.get(0).posX+","+this.solution.get(ntour).tour.get(0).posY+")");
+			System.out.println("("+Donnees.clients.get(this.solution.get(ntour).clients.get(0)).posX+","+Donnees.clients.get(this.solution.get(ntour).clients.get(0)).posY+")");
 			
 		}
 	}
@@ -76,7 +77,7 @@ public class Solution {
 		Solution bestSol = solInit.copySolution();
 		Solution currentSol = solInit.copySolution();
 		Solution solPrime = solInit.copySolution();
-		int runningTime = 5; // En minutes
+		int runningTime = 1; // En minutes
 		
 		int tMax = 25000;
 		double T0 = initTemperature(solInit);
@@ -89,20 +90,25 @@ public class Solution {
 		
 		long startTime = System.currentTimeMillis();
 		
-		while(System.currentTimeMillis() * startTime < 1000 * runningTime){
+		while(System.currentTimeMillis() - startTime < 1000 * 60 * runningTime){
 			for(int k = 1; k <= len; k++){
+				//System.out.println(this.solution.size());
+				//System.out.flush();
 				switch(1 + (int)(Math.random() * 6)){
 				case(1): // Intra Swap
-					solPrime = intraSwap(currentSol,(int) Math.random() * this.solution.size());
+					//System.out.println("intra swap");
+					solPrime = intraSwap(currentSol,ThreadLocalRandom.current().nextInt(0, this.solution.size()-1));
 					break;
 				case(2): // Intra Shift
-					solPrime = intraShift(currentSol,(int) Math.random() * this.solution.size());
+					//System.out.println("intra shift");
+					solPrime = intraShift(currentSol,ThreadLocalRandom.current().nextInt(0, this.solution.size()-1));
 					break;
 				case(3): // Intra Opt
-					int tour = (int) Math.random() * this.solution.size();
+					//System.out.println("intra opt");
+					int tour = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					int iter = 0;
-					while(currentSol.solution.get(tour).tour.size() < kOpt + 2 && iter < 100){
-						tour = (int) Math.random() * this.solution.size();
+					while(currentSol.solution.get(tour).clients.size() < kOpt + 2 && iter < 100){
+						tour = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 						iter++;
 					}
 					if(iter >= 100){ // Au cas où il n'y ait pas assez de tournées de taille kOpt
@@ -111,34 +117,42 @@ public class Solution {
 					solPrime = intraOpt(currentSol, tour, kOpt);
 					break;
 				case(4): // Inter Swap
-					int tour1 = (int) Math.random() * this.solution.size();
-					int tour2 = (int) Math.random() * this.solution.size();
+					//System.out.println("inter swap");
+					int tour1 = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
+					int tour2 = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					while(tour1 == tour2){
-						tour1 = (int) Math.random() * this.solution.size();
+						//System.out.println("1" + tour1);
+						tour1 = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					}
 					solPrime = interSwap(currentSol, tour1, tour2);
 					break;
 				case(5): // Inter Shift
-					int tour1b = (int) Math.random() * this.solution.size();
-					int tour2b = (int) Math.random() * this.solution.size();
+					//System.out.println("inter shift");
+					int tour1b = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
+					int tour2b = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					while(tour1b == tour2b){
-						tour1b = (int) Math.random() * this.solution.size();
+						//System.out.println(tour1b);
+						tour1b = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					}
 					solPrime = interShift(currentSol, tour1b, tour2b);
 					break;
 				case(6): // Inter Opt
-					int tour1c = (int) Math.random() * this.solution.size();
-					int tour2c = (int) Math.random() * this.solution.size();
+					//System.out.println("inter opt");
+					int tour1c = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
+					int tour2c = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					int iter2 = 0;
-					while(currentSol.solution.get(tour1c).tour.size() < kOpt + 2 && iter2 < 100){
-						tour1c = (int) Math.random() * this.solution.size();
+					while(currentSol.solution.get(tour1c).clients.size() < kOpt + 2 && iter2 < 100){
+						tour1c = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
+						iter2++;
 					}
 					if(iter2 >= 100){ // Au cas où il n'y ait pas assez de tournées de taille kOpt
 						break;
 					}
+					//System.out.println("62");
 					iter2 = 0;
-					while(currentSol.solution.get(tour2c).tour.size() < kOpt + 2 || tour2c == tour1c && iter2 < 100){
-						tour2c = (int) Math.random() * this.solution.size();
+					while(currentSol.solution.get(tour2c).clients.size() < kOpt + 2 || tour2c == tour1c && iter2 < 100){
+						tour2c = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
+						iter2++;
 					}
 					if(iter2 >= 100){ // Au cas où il n'y ait pas assez de tournées de taille kOpt
 						break;
@@ -167,7 +181,7 @@ public class Solution {
 			}
 		}
 		
-		System.out.println("");
+		//System.out.println("TERMINE");
 		
 		return bestSol;
 	}
@@ -177,10 +191,10 @@ public class Solution {
 		return -(w*solInit.computeTotalVisitTime())/Math.log(0.5);
 	}
 
-	private int computeTotalVisitTime() {
+	public int computeTotalVisitTime() {
 		int total = 0;
-		for(Tour t : this.solution){
-			total += t.tourDuration;
+		for(Tournee t : this.solution){
+			total += t.duree;
 		}
 		return total;
 	}
@@ -224,30 +238,28 @@ public class Solution {
 		
 		while(!possible && iteration <= MAX_ITERATION){
 			
-			int numC1 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum1).tour.size()-1);
-			int numC2 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum2).tour.size()-1);
+			int numC1 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum1).clients.size());
+			int numC2 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum2).clients.size());
 			
-			Client c1 = copy.solution.get(tourNum1).tour.get(numC1);			
-			Client c2 = copy.solution.get(tourNum2).tour.get(numC2);
+			Integer c1 = copy.solution.get(tourNum1).clients.get(numC1);			
+			Integer c2 = copy.solution.get(tourNum2).clients.get(numC2);
 			
-			copy.solution.get(tourNum1).tour.remove(c1);
-			copy.solution.get(tourNum1).tour.add(numC1, c2);
+			copy.solution.get(tourNum1).clients.remove(c1);
+			copy.solution.get(tourNum1).clients.add(numC1, c2);
 			
-			copy.solution.get(tourNum2).tour.remove(c2);
-			copy.solution.get(tourNum2).tour.add(numC2, c1);
+			copy.solution.get(tourNum2).clients.remove(c2);
+			copy.solution.get(tourNum2).clients.add(numC2, c1);
 			
 			iteration++;
 			
-			copy.solution.get(tourNum1).updateTotalVisitTime();
-			copy.solution.get(tourNum2).updateTotalVisitTime();
+			copy.solution.get(tourNum1).calculerDuree();
+			copy.solution.get(tourNum2).calculerDuree();
 			
-			possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
-		}
-		
-		
-		
-		if(!possible){
-			copy = this;
+			possible = copy.solution.get(tourNum1).estFaisable() && copy.solution.get(tourNum2).estFaisable();
+			
+			if(!possible){
+				copy = this.copySolution();
+			}
 		}
 		
 		return copy;
@@ -263,20 +275,21 @@ public class Solution {
 		
 		while(!possible && iteration <= MAX_ITERATION){
 			
-			int numC1 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum1).tour.size()-1);
+			int numC1 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum1).clients.size());
+			int numC2 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum2).clients.size());
 			
-			Client c1 = copy.solution.get(tourNum1).tour.get(numC1);
+			Integer c1 = copy.solution.get(tourNum1).clients.get(numC1);
 			
-			copy.solution.get(tourNum1).tour.remove(c1);
-			copy.solution.get(tourNum2).tour.add(numC1, c1);
+			copy.solution.get(tourNum1).clients.remove(c1);
+			copy.solution.get(tourNum2).clients.add(numC2, c1);
 			
 			iteration++;
 			
-			possible = copy.solution.get(tourNum2).isFeasible();
-		}
-		
-		if(!possible){
-			copy = this;
+			possible = copy.solution.get(tourNum2).estFaisable() && copy.solution.get(tourNum1).estFaisable();
+			
+			if(!possible){
+				copy = this.copySolution();
+			}
 		}
 		
 		return copy;
@@ -287,7 +300,7 @@ public class Solution {
 		
 		Solution copy = this.copySolution();
 		
-		if(this.solution.get(tourNum1).tour.size()-1-kOpt <= 0 || this.solution.get(tourNum2).tour.size()-1-kOpt <= 0){
+		if(this.solution.get(tourNum1).clients.size()-1-kOpt <= 0 || this.solution.get(tourNum2).clients.size()-1-kOpt <= 0){
 			return this;
 		}
 		
@@ -296,33 +309,35 @@ public class Solution {
 		
 		while(!possible && iteration <= MAX_ITERATION){
 			
-			int numC1 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum1).tour.size()-1-kOpt);
-			int numC2 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum2).tour.size()-1-kOpt);
+			//System.out.println(iteration);
+			int numC1 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum1).clients.size()-kOpt);
+			int numC2 = ThreadLocalRandom.current().nextInt(1, copy.solution.get(tourNum2).clients.size()-kOpt);
 			
-			ArrayList<Client> subTour1 = new ArrayList<Client>();
-			ArrayList<Client> subTour2 = new ArrayList<Client>();
+			ArrayList<Integer> subTour1 = new ArrayList<Integer>();
+			ArrayList<Integer> subTour2 = new ArrayList<Integer>();
 			
 			for(int i = numC1; i < numC1 + kOpt; i++){
-				subTour1.add(copy.solution.get(tourNum1).tour.remove(i));
+				//System.out.println(copy.solution.get(tourNum1));
+				subTour1.add(copy.solution.get(tourNum1).clients.remove(numC1));
 			}
 			
 			for(int i = numC2; i < numC2 + kOpt; i++){
-				subTour2.add(copy.solution.get(tourNum2).tour.remove(i));
+				subTour2.add(copy.solution.get(tourNum2).clients.remove(numC2));
 			}
 			
 			Collections.reverse(subTour1);
 			Collections.reverse(subTour2);
 			
-			copy.solution.get(tourNum1).tour.addAll(numC1, subTour2);
-			copy.solution.get(tourNum2).tour.addAll(numC2, subTour1);
+			copy.solution.get(tourNum1).clients.addAll(numC1, subTour2);
+			copy.solution.get(tourNum2).clients.addAll(numC2, subTour1);
 			
 			iteration++;
 			
-			possible = copy.solution.get(tourNum1).isFeasible() && copy.solution.get(tourNum2).isFeasible();
-		}
-		
-		if(!possible){
-			copy = this;
+			possible = copy.solution.get(tourNum1).estFaisable() && copy.solution.get(tourNum2).estFaisable();
+			
+			if(!possible){
+				copy = this.copySolution();
+			}
 		}
 		
 		return copy;
