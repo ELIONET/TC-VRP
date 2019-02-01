@@ -2,7 +2,6 @@ package tcvrp.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Solution {
@@ -77,37 +76,35 @@ public class Solution {
 		Solution bestSol = solInit.copySolution();
 		Solution currentSol = solInit.copySolution();
 		Solution solPrime = solInit.copySolution();
-		int runningTime = 1; // En minutes
+		double runningTime = 30; // En minutes
 		
-		int tMax = 25000;
 		double T0 = initTemperature(solInit);
 		double T = T0;
 		double Tb = T0;
 		double Tmax = 25000;
 		int len = 25;
+		int maxAttempt = 100000;
+		int attempt = 0;
 		int kOpt = 3;
 		double alpha = 0.9;
+		int method = 0;
 		
 		long startTime = System.currentTimeMillis();
 		
 		while(System.currentTimeMillis() - startTime < 1000 * 60 * runningTime){
 			for(int k = 1; k <= len; k++){
-				//System.out.println(this.solution.size());
-				//System.out.flush();
-				switch(1 + (int)(Math.random() * 6)){
+				method = 1 + (int)(Math.random() * 6);
+				switch(method){
 				case(1): // Intra Swap
-					//System.out.println("intra swap");
 					solPrime = intraSwap(currentSol,ThreadLocalRandom.current().nextInt(0, this.solution.size()-1));
 					break;
 				case(2): // Intra Shift
-					//System.out.println("intra shift");
 					solPrime = intraShift(currentSol,ThreadLocalRandom.current().nextInt(0, this.solution.size()-1));
 					break;
 				case(3): // Intra Opt
-					//System.out.println("intra opt");
 					int tour = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					int iter = 0;
-					while(currentSol.solution.get(tour).clients.size() < kOpt + 2 && iter < 100){
+					while(currentSol.solution.get(tour).clients.size() <= kOpt + 2 && iter < 100){
 						tour = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 						iter++;
 					}
@@ -117,7 +114,6 @@ public class Solution {
 					solPrime = intraOpt(currentSol, tour, kOpt);
 					break;
 				case(4): // Inter Swap
-					//System.out.println("inter swap");
 					int tour1 = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					int tour2 = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					while(tour1 == tour2){
@@ -127,17 +123,14 @@ public class Solution {
 					solPrime = interSwap(currentSol, tour1, tour2);
 					break;
 				case(5): // Inter Shift
-					//System.out.println("inter shift");
 					int tour1b = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					int tour2b = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					while(tour1b == tour2b){
-						//System.out.println(tour1b);
 						tour1b = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					}
 					solPrime = interShift(currentSol, tour1b, tour2b);
 					break;
 				case(6): // Inter Opt
-					//System.out.println("inter opt");
 					int tour1c = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					int tour2c = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
 					int iter2 = 0;
@@ -148,7 +141,6 @@ public class Solution {
 					if(iter2 >= 100){ // Au cas où il n'y ait pas assez de tournées de taille kOpt
 						break;
 					}
-					//System.out.println("62");
 					iter2 = 0;
 					while(currentSol.solution.get(tour2c).clients.size() < kOpt + 2 || tour2c == tour1c && iter2 < 100){
 						tour2c = ThreadLocalRandom.current().nextInt(0, this.solution.size()-1);
@@ -169,9 +161,19 @@ public class Solution {
 						currentSol = solPrime.copySolution();
 					}
 				}
-				if(solPrime.computeTotalVisitTime() <= bestSol.computeTotalVisitTime()){
+				
+				if(solPrime.computeTotalVisitTime() < bestSol.computeTotalVisitTime()){
+					System.out.println(solPrime.computeTotalVisitTime() - bestSol.computeTotalVisitTime() + " " + method);
 					bestSol = solPrime.copySolution();
 					Tb = T;
+					attempt = 0;
+				}
+				else{
+					attempt++;
+					if(attempt>=maxAttempt){
+						attempt = 0;
+						currentSol = bestSol.copySolution();
+					}
 				}
 				T = T * alpha;
 				if(T <= 0.01){
@@ -180,8 +182,6 @@ public class Solution {
 				}
 			}
 		}
-		
-		//System.out.println("TERMINE");
 		
 		return bestSol;
 	}
@@ -194,6 +194,7 @@ public class Solution {
 	public int computeTotalVisitTime() {
 		int total = 0;
 		for(Tournee t : this.solution){
+			t.calculerDuree();
 			total += t.duree;
 		}
 		return total;
@@ -317,7 +318,6 @@ public class Solution {
 			ArrayList<Integer> subTour2 = new ArrayList<Integer>();
 			
 			for(int i = numC1; i < numC1 + kOpt; i++){
-				//System.out.println(copy.solution.get(tourNum1));
 				subTour1.add(copy.solution.get(tourNum1).clients.remove(numC1));
 			}
 			

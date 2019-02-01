@@ -56,7 +56,7 @@ public class Problem {
 					int position = hub;
 					// recherche du client le plus éloigné
 					int clientSuivant = -1;
-					int tempsTrajetMax = -1;
+					double tempsTrajetMax = -1;
 					for (int clientTemp = 0; clientTemp < this.donnees.getNbClients(); clientTemp++) {
 						if (variables.getVariableY(commercial, clientTemp) == 1 && clientsVisites[clientTemp] == false && this.donnees.getTempsTrajet(position, clientTemp) 
 								> tempsTrajetMax) {
@@ -68,7 +68,6 @@ public class Problem {
 					if (2*tempsTrajetMax+this.donnees.getTempsVisite(clientSuivant) > nbDecompositions) {
 						faisable = false;
 						nbClientsVisites = nbClientsTemp;
-						//System.out.println("Résolution Impossible"); //System.out.println();
 					} else {
 						// visite du client le plus éloigné
 						solution.getLast().ajouterClient(clientSuivant);
@@ -81,7 +80,7 @@ public class Problem {
 						boolean clientVisitable = true;
 						while (nbClientsVisites != nbClientsTemp && clientVisitable) {
 							clientSuivant = -1;
-							int tempsTrajetMin = this.donnees.getTempsTrajetMax()+1;
+							double tempsTrajetMin = this.donnees.getTempsTrajetMax()+1;
 							for (int clientTemp = 0; clientTemp < this.donnees.getNbClients(); clientTemp++) {
 								if (variables.getVariableY(commercial, clientTemp) == 1 && clientsVisites[clientTemp] == false 
 										&& this.donnees.getTempsTrajet(position, clientTemp) < tempsTrajetMin
@@ -111,23 +110,26 @@ public class Problem {
 			if (faisable) {
 				this.solution = solution;
 				borneSup = nbCommerciaux;
-				for(Tournee t : this.solution){
-					t.ajouterClient(0,variables.getTC(t.clients.get(0)));
-					t.ajouterClient(t.clients.size(),variables.getTC(t.clients.get(1)));
-		}
-			} else {
+			} 
+			else {
 				borneInf = nbCommerciaux+1;
+			}
+			
+			if(borneInf == borneSup){
+				for(Tournee t : this.solution){
+					t.ajouterClient(0,variables.getHub(variables.getTC(t.clients.get(0))));
+					t.ajouterClient(t.clients.size(),variables.getHub(variables.getTC(t.clients.get(1))));
+				}
 			}
 		}
 		
-		//System.out.println("NOMBRE MINIMUM DE TC TROUVE : "+borneInf); //System.out.println();
-		this.afficherSolution();
+		//this.afficherSolution();
 		
 	}
 	
 	
 	public void afficherSolution () {
-		//System.out.println("Afficher solution");
+		System.out.println("Afficher solution");
 	}
 
 }

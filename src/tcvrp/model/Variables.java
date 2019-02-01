@@ -25,54 +25,6 @@ public class Variables {
 		
 	}
 	
-	
-	// generation totalement aléatoire des variables
-	/*private void genererVariables () {
-		this.variableX = new int[this.nbCommerciaux][this.nbClients];
-		this.variableY = new int[this.nbCommerciaux][this.nbClients];
-		for (int commercial = 0; commercial < this.nbCommerciaux; commercial++) {
-			this.variableX[commercial][(int)(Math.random()*this.nbClients)] = 1;
-		}
-		for (int client = 0; client < this.nbClients; client++) {
-			this.variableY[(int)(Math.random()*this.nbCommerciaux)][client] = 1;
-		}
-	}*/
-
-	
-	// generation aleatoire des variables avec une limite de nombre de clients par TC
-	/*private void genererVariables () {
-		this.variableX = new int[this.nbCommerciaux][this.nbClients];
-		this.variableY = new int[this.nbCommerciaux][this.nbClients];
-		for (int commercial = 0; commercial < this.nbCommerciaux; commercial++) {
-			this.variableX[commercial][(int)(Math.random()*this.nbClients)] = 1;
-		}
-		for (int client = 0; client < this.nbClients; client++) {
-			int commercial = (int)(Math.random()*this.nbCommerciaux);
-			while (this.getNbClients(commercial) >= 1.2*(this.nbClients/this.nbCommerciaux)) {
-				commercial = (int)(Math.random()*this.nbCommerciaux);
-			}
-			this.variableY[commercial][client] = 1;
-		}
-	}*/
-
-	
-	// generation aleatoire des variables en lissant le nombre de client par TC
-	/*private void genererVariables () {
-		this.variableX = new int[this.nbCommerciaux][this.nbClients];
-		this.variableY = new int[this.nbCommerciaux][this.nbClients];
-		for (int commercial = 0; commercial < this.nbCommerciaux; commercial++) {
-			this.variableX[commercial][(int)(Math.random()*this.nbClients)] = 1;
-		}
-		for (int client = 0; client < this.nbClients; client++) {
-			int commercial = (int)(Math.random()*this.nbCommerciaux);
-			while (this.getNbClients(commercial) >= 1.2*(this.nbClients/this.nbCommerciaux)) {
-				commercial = (int)(Math.random()*this.nbCommerciaux);
-			}
-			this.variableY[commercial][client] = 1;
-		}
-	}*/
-
-	
 	// generation aleatoire des variables avec aucun TC place au niveau du meme client, et TC assigne au client ou il est place
 	private void genererVariables () {
 		this.variableX = new int[this.nbCommerciaux][this.nbClients];
@@ -104,25 +56,25 @@ public class Variables {
 	}
 	
 	
-	private void afficherVariables () {
-		//System.out.println("VARIABLE Xci :");
+	public void afficherVariables () {
+		System.out.println("VARIABLE Xci :");
 		for (int commercial = 0; commercial < this.nbCommerciaux; commercial++) {
-			//System.out.print("[ ");
+			System.out.print("[ ");
 			for (int client = 0; client < this.nbClients; client++) {
 				//System.out.print(this.variableX[commercial][client]+" ");
 			}
-			//System.out.println("]");
+			System.out.println("]");
 		}
-		//System.out.println();
-		//System.out.println("VARIABLE Yci :");
+		System.out.println();
+		System.out.println("VARIABLE Yci :");
 		for (int commercial = 0; commercial < this.nbCommerciaux; commercial++) {
-			//System.out.print("[ ");
+			System.out.print("[ ");
 			for (int client = 0; client < this.nbClients; client++) {
-				//System.out.print(this.variableY[commercial][client]+" ");
+				System.out.print(this.variableY[commercial][client]+" ");
 			}
-			//System.out.println("]");
+			System.out.println("]");
 		}
-		//System.out.println();
+		System.out.println();
 	}
 	
 	
@@ -130,7 +82,7 @@ public class Variables {
 		return this.nbCommerciaux;
 	}
 	
-	
+	//Retourne le nombre de client associés à un commercial
 	public int getNbClients (int commercial) {
 		int nbClients = 0;
 		for (int client = 0; client < this.nbClients; client++) {
@@ -141,7 +93,7 @@ public class Variables {
 		return nbClients;
 	}
 	
-	
+	//Retourne la position d'un commercial
 	public int getHub (int commercial) {
 		for (int client = 0; client < this.nbClients; client++) {
 			if (this.variableX[commercial][client] == 1) {

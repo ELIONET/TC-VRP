@@ -83,6 +83,7 @@ public class Tournee {
 	
 	
 	public boolean estFaisable () {
+		this.calculerDuree();
 		return (this.duree <= this.nbDecompositions);
 	}
 	
@@ -109,6 +110,7 @@ public class Tournee {
 
 		Collections.swap(this.clients, pos1, pos2);
 		
+		this.calculerDuree();
 	}
 	
 
@@ -127,6 +129,7 @@ public class Tournee {
 		
 		Collections.rotate(this.clients.subList(pos1, pos2+1), -1);
 		
+		this.calculerDuree();
 	}
 	
 
@@ -136,6 +139,7 @@ public class Tournee {
 		
 		Collections.reverse(this.clients.subList(numC1, numC1+kOpt));
 		
+		this.calculerDuree();
 	}
 	
 }
